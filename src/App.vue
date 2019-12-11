@@ -45,7 +45,10 @@ export default {
   watch: {
     aimUrl(newVal) {
       const match = this.regExp.exec(newVal);
+
       if (match && match[1]) {
+        this.$metrika.reachGoal("transpiled");
+
         this.inliner = `javascript:(function(){var date = new Date(); date.setTime(date.getTime() + 15 * 60 * 1000); var expires = "; expires=" + date.toUTCString(); document.cookie = "bindobj=${match[1]}" + expires + "; path=/"; window.location = window.location;})();`;
         this.copyResult();
       } else {
@@ -57,6 +60,7 @@ export default {
     copyResult() {
       this.$copyText(this.inliner).then(
         () => {
+          this.$metrika.reachGoal("copied");
           this.$notify({
             title: "Copied!",
             message: "Go and paste result in adress bar",
@@ -64,6 +68,7 @@ export default {
           });
         },
         () => {
+          this.$metrika.reachGoal("not-copied");
           this.$notify({
             title: "Error",
             message: "Something went wrong",
